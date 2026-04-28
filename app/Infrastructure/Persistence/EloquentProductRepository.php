@@ -4,6 +4,7 @@ namespace App\Infrastructure\Persistence;
 
 use App\Domain\Product\Product;
 use App\Domain\Product\Ports\ProductRepositoryInterface;
+use App\Domain\Product\ProductSearchResult;
 use App\Infrastructure\Persistence\Models\ProductModel;
 
 /** Fixes: original ran one SELECT per item in a loop (N+1) — findByIds() loads all products in a single whereIn() query. */
@@ -18,13 +19,22 @@ class EloquentProductRepository implements ProductRepositoryInterface
             ->all();
     }
 
-    /** @return Product[] */
-    public function findAll(): array
+    public function search(string $query, int $perPage = 10, int $page = 1): ProductSearchResult
     {
-        return ProductModel::orderBy('name')
-            ->get()
-            ->map(fn (ProductModel $m) => $this->toDomain($m))
-            ->all();
+        $paginator = ProductModel::when(
+                $query !== '',
+                fn ($q) => $q->where('name', 'like', "%{$query}%")
+            )
+            ->orderBy('name')
+            ->paginate($perPage, ['*'], 'page', $page);
+
+        return new ProductSearchResult(
+            items:       $paginator->map(fn (ProductModel $m) => $this->toDomain($m))->all(),
+            total:       $paginator->total(),
+            perPage:     $paginator->perPage(),
+            currentPage: $paginator->currentPage(),
+            lastPage:    $paginator->lastPage(),
+        );
     }
 
     private function toDomain(ProductModel $model): Product

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Application\Order\PlaceOrderCommand;
 use App\Application\Order\PlaceOrderHandler;
-use App\Domain\Product\Ports\ProductRepositoryInterface;
 use App\Http\Requests\StoreOrderRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -14,14 +13,11 @@ class OrderController extends Controller
 {
     public function __construct(
         private readonly PlaceOrderHandler $placeOrderHandler,
-        private readonly ProductRepositoryInterface $productRepository,
     ) {}
 
     public function create(): View
     {
-        $products = collect($this->productRepository->findAll());
-
-        return view('orders.create', compact('products'));
+        return view('orders.create');
     }
 
     public function store(StoreOrderRequest $request): RedirectResponse
