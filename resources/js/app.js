@@ -64,7 +64,18 @@ class ProductPicker {
 
     async fetch() {
         const params = new URLSearchParams({ q: this.query, page: this.page });
-        const { data, meta } = await fetch(`${SEARCH_URL}?${params}`).then(r => r.json());
+        let data, meta;
+        try {
+            const res = await fetch(`${SEARCH_URL}?${params}`);
+            if (!res.ok) throw new Error(res.statusText);
+            ({ data, meta } = await res.json());
+        } catch {
+            this.resultsList.innerHTML =
+                '<p class="px-3 py-2 text-sm text-red-400">Could not load products. Please try again.</p>';
+            this.pagination.classList.add('hidden');
+            this.open();
+            return;
+        }
 
         this.lastPage = meta.last_page;
         this.renderResults(data);
