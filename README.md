@@ -5,8 +5,9 @@ A Laravel 13 application for managing customer orders, refactored from a single-
 ## Requirements
 
 - Docker & Docker Compose
+- Node.js 20+ (for building frontend assets)
 
-PHP, MySQL, and Nginx all run inside containers — no local runtime needed.
+PHP, MySQL, and Nginx all run inside containers — no local Node.js is needed at runtime.
 
 ## Setup
 
@@ -17,17 +18,28 @@ git clone <repo-url> && cd crewplanner
 # 2. Copy environment file
 cp .env.example .env
 
-# 3. Build and start containers
+# 3. Build frontend assets (requires Node.js 20+)
+npm install && npm run build
+
+# 4. Build and start containers
 docker compose up -d --build
 
-# 4. Generate app key
+# 5. Generate app key
 docker compose exec app php artisan key:generate
 
-# 5. Run migrations and seed sample products
+# 6. Run migrations and seed sample products
 docker compose exec app php artisan migrate --seed
 ```
 
 The application is now available at **http://localhost:8080**.
+
+### Frontend development
+
+To rebuild CSS/JS after editing `resources/`:
+
+```bash
+npm run build
+```
 
 ## Usage
 
