@@ -2,7 +2,7 @@
 
 namespace App\Mail;
 
-use App\Domain\Order\Order;
+use App\Domain\Order\Ports\OrderRepositoryInterface;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -13,15 +13,17 @@ class OrderConfirmation extends Mailable
 {
     use Queueable;
 
-    public function __construct(public readonly Order $order) {}
+    public function __construct(public readonly int $orderId) {}
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Order Confirmed — #' . $this->order->id());
+        return new Envelope(subject: 'Order Confirmed — #' . $this->orderId);
     }
 
     public function content(): Content
     {
-        return new Content(view: 'mail.order-confirmation');
+        $order = app(OrderRepositoryInterface::class)->findById($this->orderId);
+
+        return new Content(view: 'mail.order-confirmation', with: ['order' => $order]);
     }
 }

@@ -66,12 +66,12 @@ class PlaceOrderHandler
             'customer_type'       => $customer
                 ? ($customer->isPremium ? 'premium' : 'registered')
                 : 'guest',
-            'subtotal'            => $subtotal,
-            'discount_percentage' => $discount->percentage,
-            'total'               => $discount->total,
+            'subtotal'            => $order->subtotal(),
+            'discount_percentage' => $order->discountPercentage(),
+            'total'               => $order->total(),
         ]);
 
-        $this->orderNotifier->notifyOrderPlaced($order, $recipientEmail);
+        $this->orderNotifier->notifyOrderPlaced((int) $order->id(), $recipientEmail);
 
         return $order;
     }

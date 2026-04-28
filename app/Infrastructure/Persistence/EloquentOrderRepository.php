@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Persistence;
 
 use App\Domain\Order\Order;
+use App\Domain\Order\OrderItem;
 use App\Domain\Order\Ports\OrderRepositoryInterface;
 use App\Infrastructure\Persistence\Models\OrderItemModel;
 use App\Infrastructure\Persistence\Models\OrderModel;
@@ -24,16 +25,45 @@ class EloquentOrderRepository implements OrderRepositoryInterface
                 'status'              => $order->status(),
             ]);
 
-            foreach ($order->items() as $item) {
-                $model->items()->create([
+            $now = now();
+
+            DB::table('order_items')->insert(
+                array_map(fn (OrderItem $item) => [
+                    'order_id'     => $model->id,
                     'product_id'   => $item->productId,
                     'product_name' => $item->productName,
                     'qty'          => $item->qty,
                     'unit_price'   => $item->unitPrice,
-                ]);
-            }
+                    'created_at'   => $now,
+                    'updated_at'   => $now,
+                ], $order->items())
+            );
 
             return $order->withId($model->id);
         });
+    }
+
+    public function findById(int $id): Order
+    {
+        $model = OrderModel::with('items')->findOrFail($id);
+
+        $items = $model->items->map(fn (OrderItemModel $item) => new OrderItem(
+            productId:   $item->product_id,
+            productName: $item->product_name,
+            qty:         $item->qty,
+            unitPrice:   (float) $item->unit_price,
+        ))->all();
+
+        return new Order(
+            id:                 $model->id,
+            customerId:         $model->customer_id,
+            guestEmail:         $model->guest_email,
+            subtotal:           (float) $model->subtotal,
+            discountPercentage: (float) $model->discount_percentage,
+            discountAmount:     (float) $model->discount_amount,
+            total:              (float) $model->total,
+            status:             $model->status,
+            items:              $items,
+        );
     }
 }

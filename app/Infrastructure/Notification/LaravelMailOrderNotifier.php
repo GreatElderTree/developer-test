@@ -2,7 +2,6 @@
 
 namespace App\Infrastructure\Notification;
 
-use App\Domain\Order\Order;
 use App\Domain\Order\Ports\OrderNotifierInterface;
 use App\Mail\OrderConfirmation;
 use Illuminate\Support\Facades\Log;
@@ -12,23 +11,23 @@ use Throwable;
 /** Fixes: original called mail() inline, blocking the HTTP response until the SMTP handshake completed — this queues the mailable to Redis for async delivery. */
 class LaravelMailOrderNotifier implements OrderNotifierInterface
 {
-    public function notifyOrderPlaced(Order $order, string $recipientEmail): void
+    public function notifyOrderPlaced(int $orderId, string $recipientEmail): void
     {
         if (empty($recipientEmail)) {
-            Log::warning('Order notification skipped: no recipient email', ['order_id' => $order->id()]);
+            Log::warning('Order notification skipped: no recipient email', ['order_id' => $orderId]);
             return;
         }
 
         try {
-            Mail::to($recipientEmail)->queue(new OrderConfirmation($order));
+            Mail::to($recipientEmail)->queue(new OrderConfirmation($orderId));
 
             Log::info('Order confirmation queued', [
-                'order_id' => $order->id(),
+                'order_id' => $orderId,
                 'email'    => $recipientEmail,
             ]);
         } catch (Throwable $e) {
             Log::error('Failed to queue order confirmation', [
-                'order_id'  => $order->id(),
+                'order_id'  => $orderId,
                 'email'     => $recipientEmail,
                 'exception' => $e->getMessage(),
             ]);

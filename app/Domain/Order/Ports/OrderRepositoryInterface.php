@@ -8,4 +8,6 @@ use App\Domain\Order\Order;
 interface OrderRepositoryInterface
 {
     public function save(Order $order): Order;
+
+    public function findById(int $id): Order;
 }

@@ -141,6 +141,35 @@ class PlaceOrderHandlerTest extends TestCase
         ]);
     }
 
+    public function test_saved_order_can_be_reloaded_by_id(): void
+    {
+        $customer = CustomerModel::create(['name' => 'VIP', 'email' => 'vip@test.com', 'is_premium' => true]);
+        $p1       = $this->createProduct('Keyboard', 20.00);
+        $p2       = $this->createProduct('Mouse', 30.00);
+
+        $order = $this->handler->handle(new PlaceOrderCommand(
+            customerEmail: $customer->email,
+            items:         [
+                ['product_id' => $p1->id, 'qty' => 2],
+                ['product_id' => $p2->id, 'qty' => 1],
+            ],
+        ));
+
+        $repo     = app(\App\Domain\Order\Ports\OrderRepositoryInterface::class);
+        $reloaded = $repo->findById($order->id());
+
+        $this->assertEquals($order->id(),                $reloaded->id());
+        $this->assertEquals($order->total(),             $reloaded->total());
+        $this->assertEquals($order->discountPercentage(), $reloaded->discountPercentage());
+        $this->assertEquals($customer->id,               $reloaded->customerId());
+        $this->assertNull($reloaded->guestEmail());
+        $this->assertCount(2, $reloaded->items());
+
+        $names = array_map(fn ($i) => $i->productName, $reloaded->items());
+        $this->assertContains('Keyboard', $names);
+        $this->assertContains('Mouse',    $names);
+    }
+
     public function test_throws_when_product_not_found(): void
     {
         $this->expectException(InvalidOrderException::class);
