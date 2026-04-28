@@ -9,7 +9,7 @@ interface DiscountRuleInterface
 {
     /**
      * Return the additional discount percentage this rule contributes (e.g. 5.0 = 5%).
-     * DiscountContext enforces the 20% cap via addDiscount().
+     * DiscountCalculator passes the result to DiscountContext::withDiscount(), which enforces the 20% cap.
      */
     public function apply(DiscountContext $context): float;
 }

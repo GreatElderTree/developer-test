@@ -16,7 +16,7 @@ class DiscountCalculator
         $context = new DiscountContext($subtotal, $customer);
 
         foreach ($this->rules as $rule) {
-            $context->addDiscount($rule->apply($context));
+            $context = $context->withDiscount($rule->apply($context));
         }
 
         return new DiscountResult($context->accumulatedDiscount(), $subtotal);

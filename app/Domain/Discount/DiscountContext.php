@@ -4,21 +4,24 @@ namespace App\Domain\Discount;
 
 use App\Domain\Customer\Customer;
 
-/** Carries mutable discount state through the rule pipeline and enforces the 20% hard cap via addDiscount(). */
+/** Immutable snapshot of discount state; each rule produces a new instance via withDiscount(). */
 class DiscountContext
 {
     private const MAX_DISCOUNT = 20.0;
 
-    private float $accumulatedDiscount = 0.0;
-
     public function __construct(
         public readonly float $subtotal,
         public readonly ?Customer $customer,
+        private readonly float $accumulatedDiscount = 0.0,
     ) {}
 
-    public function addDiscount(float $percentage): void
+    public function withDiscount(float $percentage): self
     {
-        $this->accumulatedDiscount = min(self::MAX_DISCOUNT, $this->accumulatedDiscount + $percentage);
+        return new self(
+            subtotal:            $this->subtotal,
+            customer:            $this->customer,
+            accumulatedDiscount: min(self::MAX_DISCOUNT, $this->accumulatedDiscount + $percentage),
+        );
     }
 
     public function accumulatedDiscount(): float
