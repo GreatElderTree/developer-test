@@ -3,7 +3,6 @@
 namespace App\Infrastructure\Persistence\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class OrderModel extends Model
@@ -19,11 +18,6 @@ class OrderModel extends Model
         'discount_amount'     => 'decimal:2',
         'total'               => 'decimal:2',
     ];
-
-    public function customer(): BelongsTo
-    {
-        return $this->belongsTo(CustomerModel::class, 'customer_id');
-    }
 
     public function items(): HasMany
     {
