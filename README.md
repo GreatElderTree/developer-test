@@ -36,7 +36,7 @@ The application is now available at **http://localhost:8080**.
 Visit [http://localhost:8080/order](http://localhost:8080/order).
 
 - Enter your email. Existing customers are resolved automatically; unknown emails are treated as guests.
-- Add products and quantities. The order summary updates live with estimated discounts.
+- Search for products and add quantities. The order summary updates live with estimated discounts.
 - Submit to place the order. A confirmation email is sent asynchronously via the queue worker.
 
 ### Creating a customer via CLI
@@ -50,11 +50,11 @@ Interactive prompts ask for name, email, and whether the customer is premium.
 ### Running tests
 
 ```bash
-# All tests (27 tests, SQLite in-memory — no DB setup needed)
+# All tests (36 tests, SQLite in-memory — no DB setup needed)
 docker compose exec app php artisan test
 
 # Single file
-docker compose exec app php artisan test tests/Feature/OrderServiceTest.php
+docker compose exec app php artisan test tests/Feature/PlaceOrderHandlerTest.php
 
 # Single test by name
 docker compose exec app php artisan test --filter=test_applies_premium_discount_on_top
@@ -68,7 +68,7 @@ docker compose exec app php artisan test --filter=test_applies_premium_discount_
 | Customer is premium | +5% |
 | **Maximum total** | **20%** |
 
-Rules are applied in sequence and capped at 20%. To add a new rule: implement `App\Contracts\DiscountRuleInterface` and register it in `AppServiceProvider` — no existing code changes required.
+Rules are applied in sequence and capped at 20%. To add a new rule: implement `App\Domain\Discount\Rules\DiscountRuleInterface` and register it in `AppServiceProvider` — no existing code changes required.
 
 ## Architecture
 
@@ -81,15 +81,18 @@ app/
   Domain/Discount/Rules/                          # One class per discount rule
   Application/Order/PlaceOrderHandler.php         # Orchestrates order creation in a DB transaction
   Infrastructure/Notification/LaravelMailOrderNotifier.php # Queued notifier — non-blocking
+  Infrastructure/Persistence/EloquentOrderRepository.php   # Bulk item inserts + findById for queue worker
   Http/Controllers/OrderController.php
+  Http/Controllers/ProductController.php          # Paginated product search endpoint
   Http/Requests/StoreOrderRequest.php
   Console/Commands/CreateCustomer.php
 ```
 
 **Key design decisions:**
 
-- `PlaceOrderHandler` loads all products in a single `whereIn` query — no N+1.
-- Confirmation emails are queued; the HTTP response is never blocked by mail delivery.
+- `PlaceOrderHandler` loads all products in a single `whereIn` query — no N+1 reads.
+- Order items are persisted in a single bulk `INSERT` — no N+1 writes.
+- Confirmation emails store only the order ID in the queue payload; the worker reloads from the DB.
 - The discount pipeline is open for extension: new rules register in `AppServiceProvider` without touching existing classes.
 - Guest orders store `guest_email` on the order; `customer_id` is nullable.
 

@@ -16,7 +16,7 @@ docker compose up -d --build
 docker compose exec app php artisan test
 
 # Run a single test file
-docker compose exec app php artisan test tests/Feature/OrderServiceTest.php
+docker compose exec app php artisan test tests/Feature/PlaceOrderHandlerTest.php
 
 # Run a single test by name
 docker compose exec app php artisan test --filter=test_applies_premium_discount_on_top
@@ -33,30 +33,30 @@ docker compose exec app php artisan queue:work
 
 ## Architecture
 
-### Discount pipeline (`app/Services/Discount/`)
+### Discount pipeline (`app/Domain/Discount/`)
 
-The core extensibility point. `DiscountService` holds an ordered array of `DiscountRuleInterface` implementations. Each rule returns an additional percentage; the service accumulates and caps at 20%. Rules are registered in `AppServiceProvider::register()` — adding a new rule is a one-liner there.
+The core extensibility point. `DiscountCalculator` holds an ordered array of `DiscountRuleInterface` implementations. Each rule returns an additional percentage; the calculator accumulates and caps at 20%. Rules are registered in `AppServiceProvider::register()` — adding a new rule is a one-liner there.
 
 - `OrderTotalDiscountRule` — subtotal > 100 → 10%
-- `PremiumCustomerDiscountRule` — `customer->is_premium` → 5%
-- `OrderDiscountContext` DTO carries `subtotal`, `customer`, and the mutable `accumulatedDiscount` through the pipeline
+- `PremiumCustomerDiscountRule` — `customer->isPremium` → 5%
+- `DiscountContext` DTO carries `subtotal`, `customer`, and the mutable `accumulatedDiscount` through the pipeline
 - `DiscountResult` DTO is the immutable output: `percentage`, `amount`, `total`
 
-### OrderService (`app/Services/OrderService.php`)
+### PlaceOrderHandler (`app/Application/Order/PlaceOrderHandler.php`)
 
-Entry point for all order creation. Wraps everything in `DB::transaction()`. Loads products via a single `whereIn` (no N+1). Calls `DiscountService::calculate()` then persists `Order` + `OrderItem` records, dispatches `OrderPlaced` event.
+Entry point for all order creation. Loads products via a single `whereIn` (no N+1). Calls `DiscountCalculator::calculate()` then persists `Order` + `OrderItem` records via `EloquentOrderRepository` (which wraps everything in `DB::transaction()`). Fires async notification.
 
-### Event flow
+### Notification flow
 
-`OrderPlaced` event → `SendOrderConfirmationEmail` listener (`ShouldQueue`) → `OrderConfirmation` Mailable. Jobs are pushed to **Redis** (`QUEUE_CONNECTION=redis`, `phpredis` extension) and consumed by the dedicated `queue` container running `queue:work redis`. The listener is registered in `AppServiceProvider::boot()`.
+`LaravelMailOrderNotifier` queues an `OrderConfirmation` mailable (stores only the order ID). The queue worker reloads the order from the database via `EloquentOrderRepository::findById()` and renders the Blade template. Jobs are pushed to **Redis** (`QUEUE_CONNECTION=redis`, `phpredis` extension) and consumed by the dedicated `queue` container running `queue:work`.
 
 ### HTTP layer
 
-Two routes (`GET /order`, `POST /order`) → `OrderController`. The controller resolves a `Customer` by email (or passes `null` for guests) and delegates to `OrderService`. `StoreOrderRequest` handles validation.
+Two routes (`GET /order`, `POST /order`) → `OrderController`. `StoreOrderRequest` handles validation. `GET /products/search` → `ProductController` returns paginated JSON for the live product picker.
 
 ### Database
 
 - `customers`: `id`, `name`, `email` (unique), `is_premium`
 - `products`: `id`, `name`, `price`
 - `orders`: `id`, `customer_id` (nullable), `guest_email` (nullable), `subtotal`, `discount_percentage`, `discount_amount`, `total`, `status`
-- `order_items`: `id`, `order_id`, `product_id`, `qty`, `unit_price`
+- `order_items`: `id`, `order_id`, `product_id`, `product_name`, `qty`, `unit_price`
