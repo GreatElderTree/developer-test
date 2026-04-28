@@ -158,12 +158,13 @@
                     <span id="summary-discount" class="font-mono">−€0.00</span>
                 </div>
                 <div class="flex justify-between font-bold text-base border-t pt-2">
-                    <span>Estimated Total</span>
+                    <span>Estimated Total *</span>
                     <span id="summary-total" class="font-mono">€0.00</span>
                 </div>
             </div>
             <p class="text-xs text-gray-400 mt-3">
-                Discounts applied at checkout: 10% for orders over €100, additional 5% for premium customers (max 20%).
+                * Preview reflects the 10% order-total discount (orders over €100) only.
+                Premium customers receive an additional 5% off at checkout (max combined discount: 20%).
             </p>
         </div>
 
