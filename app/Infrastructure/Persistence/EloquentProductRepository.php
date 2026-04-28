@@ -21,9 +21,11 @@ class EloquentProductRepository implements ProductRepositoryInterface
 
     public function search(string $query, int $perPage = 10, int $page = 1): ProductSearchResult
     {
+        $safe = str_replace(['%', '_'], ['\\%', '\\_'], $query);
+
         $paginator = ProductModel::when(
-                $query !== '',
-                fn ($q) => $q->where('name', 'like', "%{$query}%")
+                $safe !== '',
+                fn ($q) => $q->where('name', 'like', "%{$safe}%")
             )
             ->orderBy('name')
             ->paginate($perPage, ['*'], 'page', $page);
