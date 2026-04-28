@@ -19,7 +19,7 @@ git clone <repo-url> && cd crewplanner
 cp .env.example .env
 
 # 3. Build frontend assets (requires Node.js 20+)
-npm install && npm run build
+npm ci && npm run build
 
 # 4. Build and start containers
 docker compose up -d --build
