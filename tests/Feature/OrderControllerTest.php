@@ -118,4 +118,27 @@ class OrderControllerTest extends TestCase
             'items'          => [['product_id' => $product->id, 'qty' => 0]],
         ])->assertSessionHasErrors('items.0.qty');
     }
+
+    public function test_validation_rejects_qty_over_maximum(): void
+    {
+        $product = $this->createProduct();
+
+        $this->post(route('orders.store'), [
+            'customer_email' => 'test@example.com',
+            'items'          => [['product_id' => $product->id, 'qty' => 1001]],
+        ])->assertSessionHasErrors('items.0.qty');
+    }
+
+    public function test_validation_rejects_duplicate_product_ids(): void
+    {
+        $product = $this->createProduct();
+
+        $this->post(route('orders.store'), [
+            'customer_email' => 'test@example.com',
+            'items'          => [
+                ['product_id' => $product->id, 'qty' => 1],
+                ['product_id' => $product->id, 'qty' => 2],
+            ],
+        ])->assertSessionHasErrors('items.0.product_id');
+    }
 }

@@ -16,9 +16,9 @@ class StoreOrderRequest extends FormRequest
     {
         return [
             'customer_email'          => ['required', 'email'],
-            'items'                   => ['required', 'array', 'min:1'],
-            'items.*.product_id'      => ['required', 'integer', 'exists:products,id'],
-            'items.*.qty'             => ['required', 'integer', 'min:1'],
+            'items'                   => ['required', 'array', 'min:1', 'max:50'],
+            'items.*.product_id'      => ['required', 'integer', 'exists:products,id', 'distinct'],
+            'items.*.qty'             => ['required', 'integer', 'min:1', 'max:1000'],
         ];
     }
 

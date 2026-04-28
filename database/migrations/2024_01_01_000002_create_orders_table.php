@@ -16,7 +16,7 @@ return new class extends Migration
             $table->decimal('discount_percentage', 5, 2)->default(0);
             $table->decimal('discount_amount', 10, 2)->default(0);
             $table->decimal('total', 10, 2);
-            $table->enum('status', ['pending', 'confirmed', 'cancelled'])->default('confirmed');
+            $table->enum('status', ['confirmed', 'cancelled'])->default('confirmed');
             $table->timestamps();
         });
     }

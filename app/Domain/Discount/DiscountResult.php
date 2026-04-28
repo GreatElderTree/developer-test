@@ -12,7 +12,8 @@ class DiscountResult
         public readonly float $percentage,
         public readonly float $subtotal,
     ) {
-        $this->amount = round($subtotal * $percentage / 100, 2);
-        $this->total  = round($subtotal - $this->amount, 2);
+        $amount       = bcmul((string) $subtotal, bcdiv((string) $percentage, '100', 10), 2);
+        $this->amount = (float) $amount;
+        $this->total  = (float) bcsub((string) $subtotal, $amount, 2);
     }
 }

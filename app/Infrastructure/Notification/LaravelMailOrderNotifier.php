@@ -26,6 +26,8 @@ class LaravelMailOrderNotifier implements OrderNotifierInterface
                 'email'    => $recipientEmail,
             ]);
         } catch (Throwable $e) {
+            // Intentional fire-and-forget: a failed enqueue (e.g. Redis down) is logged but does
+            // not roll back the order. Email delivery is best-effort; the order is already confirmed.
             Log::error('Failed to queue order confirmation', [
                 'order_id'  => $orderId,
                 'email'     => $recipientEmail,
