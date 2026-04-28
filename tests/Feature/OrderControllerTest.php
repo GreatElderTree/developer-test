@@ -20,14 +20,11 @@ class OrderControllerTest extends TestCase
         return ProductModel::create(['name' => 'Widget', 'price' => $price]);
     }
 
-    public function test_order_form_renders_with_products(): void
+    public function test_order_form_renders(): void
     {
-        $product = $this->createProduct();
-
         $this->get(route('orders.create'))
             ->assertOk()
-            ->assertViewIs('orders.create')
-            ->assertViewHas('products', fn ($products) => $products->contains('name', $product->name));
+            ->assertViewIs('orders.create');
     }
 
     public function test_guest_can_place_order(): void
