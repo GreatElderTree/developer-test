@@ -1,6 +1,6 @@
 # Order Management System
 
-A Laravel 11 application for managing customer orders, refactored from a single-file PHP script.
+A Laravel 13 application for managing customer orders, refactored from a single-file PHP script.
 
 ## Requirements
 
@@ -50,7 +50,7 @@ Interactive prompts ask for name, email, and whether the customer is premium.
 ### Running tests
 
 ```bash
-# All tests (36 tests, SQLite in-memory — no DB setup needed)
+# All tests (39 tests, SQLite in-memory — no DB setup needed)
 docker compose exec app php artisan test
 
 # Single file
@@ -75,7 +75,7 @@ Rules are applied in sequence and capped at 20%. To add a new rule: implement `A
 ```
 app/
   Domain/Discount/Rules/DiscountRuleInterface.php # Interface all discount rules implement
-  Domain/Discount/DiscountContext.php             # Mutable context passed through the pipeline
+  Domain/Discount/DiscountContext.php             # Immutable context passed through the pipeline
   Domain/Discount/DiscountResult.php              # Immutable result (percentage, amount, total)
   Domain/Discount/DiscountCalculator.php          # Runs the rule pipeline, enforces 20% cap
   Domain/Discount/Rules/                          # One class per discount rule
@@ -92,9 +92,11 @@ app/
 
 - `PlaceOrderHandler` loads all products in a single `whereIn` query — no N+1 reads.
 - Order items are persisted in a single bulk `INSERT` — no N+1 writes.
+- Monetary arithmetic uses `bcmath` throughout to avoid IEEE 754 float drift.
 - Confirmation emails store only the order ID in the queue payload; the worker reloads from the DB.
 - The discount pipeline is open for extension: new rules register in `AppServiceProvider` without touching existing classes.
 - Guest orders store `guest_email` on the order; `customer_id` is nullable.
+- Order requests enforce a maximum of 50 line items, 1 000 units per line, and reject duplicate product IDs.
 
 ## Docker services
 
