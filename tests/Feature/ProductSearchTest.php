@@ -12,8 +12,8 @@ class ProductSearchTest extends TestCase
 
     public function test_returns_matching_products(): void
     {
-        ProductModel::create(['name' => 'Widget', 'price' => 50.00]);
-        ProductModel::create(['name' => 'Gadget', 'price' => 30.00]);
+        ProductModel::create(['name' => 'Widget', 'price' => 5000]);
+        ProductModel::create(['name' => 'Gadget', 'price' => 3000]);
 
         $this->getJson(route('products.search', ['q' => 'wid']))
             ->assertOk()
@@ -23,8 +23,8 @@ class ProductSearchTest extends TestCase
 
     public function test_empty_query_returns_all_products(): void
     {
-        ProductModel::create(['name' => 'Widget', 'price' => 50.00]);
-        ProductModel::create(['name' => 'Gadget', 'price' => 30.00]);
+        ProductModel::create(['name' => 'Widget', 'price' => 5000]);
+        ProductModel::create(['name' => 'Gadget', 'price' => 3000]);
 
         $this->getJson(route('products.search'))
             ->assertOk()
@@ -34,7 +34,7 @@ class ProductSearchTest extends TestCase
     public function test_results_are_paginated(): void
     {
         for ($i = 1; $i <= 12; $i++) {
-            ProductModel::create(['name' => "Product {$i}", 'price' => 10.00]);
+            ProductModel::create(['name' => "Product {$i}", 'price' => 1000]);
         }
 
         $response = $this->getJson(route('products.search', ['page' => 2]))
@@ -48,7 +48,7 @@ class ProductSearchTest extends TestCase
 
     public function test_response_has_expected_shape(): void
     {
-        ProductModel::create(['name' => 'Widget', 'price' => 50.00]);
+        ProductModel::create(['name' => 'Widget', 'price' => 5000]);
 
         $this->getJson(route('products.search'))
             ->assertOk()
@@ -60,7 +60,7 @@ class ProductSearchTest extends TestCase
 
     public function test_search_is_case_insensitive(): void
     {
-        ProductModel::create(['name' => 'Widget', 'price' => 50.00]);
+        ProductModel::create(['name' => 'Widget', 'price' => 5000]);
 
         $this->getJson(route('products.search', ['q' => 'WIDGET']))
             ->assertOk()

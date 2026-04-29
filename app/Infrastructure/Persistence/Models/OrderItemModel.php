@@ -8,5 +8,5 @@ class OrderItemModel extends Model
 {
     protected $table    = 'order_items';
     protected $fillable = ['order_id', 'product_id', 'product_name', 'qty', 'unit_price'];
-    protected $casts    = ['unit_price' => 'decimal:2', 'qty' => 'integer'];
+    protected $casts    = ['unit_price' => 'integer', 'qty' => 'integer'];
 }

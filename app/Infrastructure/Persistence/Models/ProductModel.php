@@ -8,5 +8,5 @@ class ProductModel extends Model
 {
     protected $table    = 'products';
     protected $fillable = ['name', 'price'];
-    protected $casts    = ['price' => 'decimal:2'];
+    protected $casts    = ['price' => 'integer'];
 }

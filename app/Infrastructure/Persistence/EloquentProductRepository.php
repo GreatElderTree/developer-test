@@ -44,7 +44,7 @@ class EloquentProductRepository implements ProductRepositoryInterface
         return new Product(
             id:    $model->id,
             name:  $model->name,
-            price: (string) $model->price,
+            price: $model->price,
         );
     }
 }

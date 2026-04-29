@@ -40,12 +40,12 @@ class PlaceOrderHandler
             }
         }
 
-        $subtotal  = '0.00';
+        $subtotal   = 0;
         $orderItems = [];
 
         foreach ($command->items as $item) {
             $product     = $products[$item['product_id']];
-            $subtotal    = bcadd($subtotal, bcmul($product->price, (string) $item['qty'], 2), 2);
+            $subtotal   += $product->price * $item['qty'];
             $orderItems[] = new OrderItem(
                 productId:   $product->id,
                 productName: $product->name,

@@ -95,7 +95,7 @@ class ProductPicker {
                 data-id="${escHtml(p.id)}" data-name="${escHtml(p.name)}" data-price="${escHtml(p.price)}"
                 class="result-item w-full text-left px-3 py-2 text-sm hover:bg-indigo-50 flex justify-between gap-2">
                 <span>${escHtml(p.name)}</span>
-                <span class="text-gray-400 font-mono shrink-0">€${escHtml(p.price)}</span>
+                <span class="text-gray-400 font-mono shrink-0">€${(p.price / 100).toFixed(2)}</span>
             </button>`
         ).join('');
 
@@ -187,24 +187,24 @@ function updateSummary() {
     let subtotal = 0;
 
     container.querySelectorAll('.item-row').forEach(row => {
-        const price = parseFloat(row.querySelector('.product-price-input').value) || 0;
-        const qty   = parseInt(row.querySelector('.qty-input').value)             || 0;
+        const price = parseInt(row.querySelector('.product-price-input').value)  || 0;
+        const qty   = parseInt(row.querySelector('.qty-input').value)            || 0;
         const line  = price * qty;
         subtotal   += line;
-        row.querySelector('.line-total').textContent = '€' + line.toFixed(2);
+        row.querySelector('.line-total').textContent = '€' + (line / 100).toFixed(2);
     });
 
-    let discountPct = subtotal > 100 ? 10 : 0;
-    const discountAmt = subtotal * discountPct / 100;
+    let discountPct = subtotal > 10000 ? 10 : 0;
+    const discountAmt = Math.round(subtotal * discountPct / 100);
     const total       = subtotal - discountAmt;
 
-    document.getElementById('summary-subtotal').textContent = '€' + subtotal.toFixed(2);
-    document.getElementById('summary-total').textContent    = '€' + total.toFixed(2);
+    document.getElementById('summary-subtotal').textContent = '€' + (subtotal / 100).toFixed(2);
+    document.getElementById('summary-total').textContent    = '€' + (total / 100).toFixed(2);
 
     const discountRow = document.getElementById('discount-row');
     if (discountPct > 0) {
         document.getElementById('discount-label').textContent  = `Discount (${discountPct}%)`;
-        document.getElementById('summary-discount').textContent = '−€' + discountAmt.toFixed(2);
+        document.getElementById('summary-discount').textContent = '−€' + (discountAmt / 100).toFixed(2);
         discountRow.style.removeProperty('display');
     } else {
         discountRow.style.setProperty('display', 'none', 'important');

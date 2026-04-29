@@ -15,7 +15,7 @@ class OrderControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function createProduct(float $price = 50.00): ProductModel
+    private function createProduct(int $price = 5000): ProductModel
     {
         return ProductModel::create(['name' => 'Widget', 'price' => $price]);
     }
@@ -29,7 +29,7 @@ class OrderControllerTest extends TestCase
 
     public function test_guest_can_place_order(): void
     {
-        $product = $this->createProduct(50.00);
+        $product = $this->createProduct();
 
         $this->post(route('orders.store'), [
             'customer_email' => 'guest@example.com',
@@ -41,14 +41,14 @@ class OrderControllerTest extends TestCase
         $this->assertDatabaseHas('orders', [
             'guest_email' => 'guest@example.com',
             'customer_id' => null,
-            'total'       => '50.00',
+            'total'       => 5000,
         ]);
     }
 
     public function test_premium_customer_gets_discount(): void
     {
         $customer = CustomerModel::create(['name' => 'VIP', 'email' => 'vip@test.com', 'is_premium' => true]);
-        $product  = $this->createProduct(60.00);
+        $product  = $this->createProduct(6000);
 
         $this->post(route('orders.store'), [
             'customer_email' => 'vip@test.com',
@@ -60,7 +60,7 @@ class OrderControllerTest extends TestCase
         $this->assertDatabaseHas('orders', [
             'customer_id'         => $customer->id,
             'discount_percentage' => '15.00',
-            'total'               => '102.00',
+            'total'               => 10200,
         ]);
     }
 
@@ -69,7 +69,7 @@ class OrderControllerTest extends TestCase
         Mail::fake();
         $this->app->bind(OrderNotifierInterface::class, LaravelMailOrderNotifier::class);
 
-        $product = $this->createProduct(50.00);
+        $product = $this->createProduct();
 
         $this->post(route('orders.store'), [
             'customer_email' => 'buyer@example.com',
@@ -85,7 +85,7 @@ class OrderControllerTest extends TestCase
     {
         $this->app->bind(OrderNotifierInterface::class, LaravelMailOrderNotifier::class);
 
-        $product = $this->createProduct(33.33);
+        $product = $this->createProduct(3333);
 
         $this->post(route('orders.store'), [
             'customer_email' => 'buyer@example.com',

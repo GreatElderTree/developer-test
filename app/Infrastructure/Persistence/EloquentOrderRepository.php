@@ -51,17 +51,17 @@ class EloquentOrderRepository implements OrderRepositoryInterface
             productId:   $item->product_id,
             productName: $item->product_name,
             qty:         $item->qty,
-            unitPrice:   (string) $item->unit_price,
+            unitPrice:   $item->unit_price,
         ))->all();
 
         return new Order(
             id:                 $model->id,
             customerId:         $model->customer_id,
             guestEmail:         $model->guest_email,
-            subtotal:           (string) $model->subtotal,
+            subtotal:           $model->subtotal,
             discountPercentage: (string) $model->discount_percentage,
-            discountAmount:     (string) $model->discount_amount,
-            total:              (string) $model->total,
+            discountAmount:     $model->discount_amount,
+            total:              $model->total,
             status:             $model->status,
             items:              $items,
         );

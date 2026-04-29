@@ -24,17 +24,17 @@
             <tr>
                 <td>{{ $item->productName }}</td>
                 <td>{{ $item->qty }}</td>
-                <td>€{{ number_format($item->unitPrice, 2) }}</td>
-                <td>€{{ number_format($item->lineTotal, 2) }}</td>
+                <td>€{{ number_format($item->unitPrice / 100, 2) }}</td>
+                <td>€{{ number_format($item->lineTotal / 100, 2) }}</td>
             </tr>
             @endforeach
         </tbody>
         <tfoot>
-            <tr><td colspan="3">Subtotal</td><td>€{{ number_format($order->subtotal(), 2) }}</td></tr>
-            @if ($order->discountPercentage() > 0)
-            <tr><td colspan="3">Discount ({{ $order->discountPercentage() }}%)</td><td>-€{{ number_format($order->discountAmount(), 2) }}</td></tr>
+            <tr><td colspan="3">Subtotal</td><td>€{{ number_format($order->subtotal() / 100, 2) }}</td></tr>
+            @if ((float) $order->discountPercentage() > 0)
+            <tr><td colspan="3">Discount ({{ rtrim(rtrim($order->discountPercentage(), '0'), '.') }}%)</td><td>-€{{ number_format($order->discountAmount() / 100, 2) }}</td></tr>
             @endif
-            <tr class="total-row"><td colspan="3">Total</td><td>€{{ number_format($order->total(), 2) }}</td></tr>
+            <tr class="total-row"><td colspan="3">Total</td><td>€{{ number_format($order->total() / 100, 2) }}</td></tr>
         </tfoot>
     </table>
 </body>

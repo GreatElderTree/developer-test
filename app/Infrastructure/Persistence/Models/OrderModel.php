@@ -13,10 +13,10 @@ class OrderModel extends Model
         'subtotal', 'discount_percentage', 'discount_amount', 'total', 'status',
     ];
     protected $casts = [
-        'subtotal'            => 'decimal:2',
+        'subtotal'            => 'integer',
         'discount_percentage' => 'decimal:2',
-        'discount_amount'     => 'decimal:2',
-        'total'               => 'decimal:2',
+        'discount_amount'     => 'integer',
+        'total'               => 'integer',
     ];
 
     public function items(): HasMany

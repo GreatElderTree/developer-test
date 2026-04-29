@@ -10,7 +10,7 @@ class DiscountContext
     private const MAX_DISCOUNT = 20.0;
 
     public function __construct(
-        public readonly string $subtotal,
+        public readonly int $subtotal,
         public readonly ?Customer $customer,
         private readonly float $accumulatedDiscount = 0.0,
     ) {}

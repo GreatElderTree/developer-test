@@ -35,6 +35,6 @@ class OrderController extends Controller
 
         return redirect()->route('orders.create')
             ->with('success', "Order #{$order->id()} placed! Total: €"
-                . number_format((float) $order->total(), 2) . $discountNote);
+                . number_format($order->total() / 100, 2) . $discountNote);
     }
 }

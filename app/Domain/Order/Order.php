@@ -15,10 +15,10 @@ class Order
         private readonly ?int $id,
         private readonly ?int $customerId,
         private readonly ?string $guestEmail,
-        private readonly string $subtotal,
+        private readonly int $subtotal,
         private readonly string $discountPercentage,
-        private readonly string $discountAmount,
-        private readonly string $total,
+        private readonly int $discountAmount,
+        private readonly int $total,
         private readonly string $status,
         private readonly array $items,
     ) {}
@@ -60,10 +60,10 @@ class Order
     public function id(): ?int                { return $this->id; }
     public function customerId(): ?int        { return $this->customerId; }
     public function guestEmail(): ?string     { return $this->guestEmail; }
-    public function subtotal(): string        { return $this->subtotal; }
+    public function subtotal(): int           { return $this->subtotal; }
     public function discountPercentage(): string { return $this->discountPercentage; }
-    public function discountAmount(): string  { return $this->discountAmount; }
-    public function total(): string           { return $this->total; }
+    public function discountAmount(): int     { return $this->discountAmount; }
+    public function total(): int              { return $this->total; }
     public function status(): string          { return $this->status; }
     /** @return OrderItem[] */
     public function items(): array            { return $this->items; }

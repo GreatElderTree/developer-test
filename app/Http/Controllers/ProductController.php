@@ -26,7 +26,7 @@ class ProductController extends Controller
             'data' => array_map(fn (Product $p) => [
                 'id'    => $p->id,
                 'name'  => $p->name,
-                'price' => round($p->price, 2),
+                'price' => $p->price,
             ], $result->items),
             'meta' => [
                 'current_page' => $result->currentPage,
