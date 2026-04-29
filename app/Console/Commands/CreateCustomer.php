@@ -13,8 +13,9 @@ class CreateCustomer extends Command
     protected $signature   = 'customer:create';
     protected $description = 'Create a new customer';
 
-    public function __construct(private readonly CreateCustomerHandler $handler)
-    {
+    public function __construct(
+        private readonly CreateCustomerHandler $handler,
+    ) {
         parent::__construct();
     }
 

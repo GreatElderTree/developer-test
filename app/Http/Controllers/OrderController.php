@@ -29,12 +29,12 @@ class OrderController extends Controller
             )
         );
 
-        $discountNote = $order->discountPercentage() > 0
-            ? " ({$order->discountPercentage()}% discount applied)"
+        $discountNote = (float) $order->discountPercentage() > 0
+            ? ' (' . rtrim(rtrim($order->discountPercentage(), '0'), '.') . '% discount applied)'
             : '';
 
         return redirect()->route('orders.create')
             ->with('success', "Order #{$order->id()} placed! Total: €"
-                . number_format($order->total(), 2) . $discountNote);
+                . number_format((float) $order->total(), 2) . $discountNote);
     }
 }

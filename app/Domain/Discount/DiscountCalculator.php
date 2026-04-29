@@ -19,6 +19,6 @@ class DiscountCalculator
             $context = $context->withDiscount($rule->apply($context));
         }
 
-        return new DiscountResult((string) $context->accumulatedDiscount(), $subtotal);
+        return new DiscountResult(number_format($context->accumulatedDiscount(), 2, '.', ''), $subtotal);
     }
 }

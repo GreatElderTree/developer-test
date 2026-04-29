@@ -9,6 +9,6 @@ class OrderTotalDiscountRule implements DiscountRuleInterface
 {
     public function apply(DiscountContext $context): float
     {
-        return $context->subtotal > 100 ? 10.0 : 0.0;
+        return bccomp($context->subtotal, '100', 2) > 0 ? 10.0 : 0.0;
     }
 }

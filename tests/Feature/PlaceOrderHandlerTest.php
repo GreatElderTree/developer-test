@@ -36,10 +36,10 @@ class PlaceOrderHandlerTest extends TestCase
             items:         [['product_id' => $product->id, 'qty' => 2]],
         ));
 
-        $this->assertEquals(100.0, $order->subtotal());
-        $this->assertEquals(0.0,   $order->discountPercentage());
-        $this->assertEquals(0.0,   $order->discountAmount());
-        $this->assertEquals(100.0, $order->total());
+        $this->assertSame('100.00', $order->subtotal());
+        $this->assertSame('0.00',  $order->discountPercentage());
+        $this->assertSame('0.00',  $order->discountAmount());
+        $this->assertSame('100.00', $order->total());
         $this->assertNull($order->customerId());
         $this->assertEquals('guest@example.com', $order->guestEmail());
 
@@ -63,10 +63,10 @@ class PlaceOrderHandlerTest extends TestCase
             items:         [['product_id' => $product->id, 'qty' => 2]],
         ));
 
-        $this->assertEquals(120.0, $order->subtotal());
-        $this->assertEquals(10.0,  $order->discountPercentage());
-        $this->assertEquals(12.0,  $order->discountAmount());
-        $this->assertEquals(108.0, $order->total());
+        $this->assertSame('120.00', $order->subtotal());
+        $this->assertSame('10.00', $order->discountPercentage());
+        $this->assertSame('12.00', $order->discountAmount());
+        $this->assertSame('108.00', $order->total());
 
         $this->assertDatabaseHas('orders', [
             'subtotal'            => '120.00',
@@ -86,9 +86,9 @@ class PlaceOrderHandlerTest extends TestCase
             items:         [['product_id' => $product->id, 'qty' => 2]],
         ));
 
-        $this->assertEquals(15.0,          $order->discountPercentage());
-        $this->assertEquals(18.0,          $order->discountAmount());
-        $this->assertEquals(102.0,         $order->total());
+        $this->assertSame('15.00', $order->discountPercentage());
+        $this->assertSame('18.00', $order->discountAmount());
+        $this->assertSame('102.00', $order->total());
         $this->assertEquals($customer->id, $order->customerId());
         $this->assertNull($order->guestEmail());
     }
@@ -105,10 +105,10 @@ class PlaceOrderHandlerTest extends TestCase
 
         $this->assertEquals($customer->id, $order->customerId());
         $this->assertNull($order->guestEmail());
-        $this->assertEquals(80.0, $order->subtotal());
-        $this->assertEquals(0.0,  $order->discountPercentage());
-        $this->assertEquals(0.0,  $order->discountAmount());
-        $this->assertEquals(80.0, $order->total());
+        $this->assertSame('80.00', $order->subtotal());
+        $this->assertSame('0.00',  $order->discountPercentage());
+        $this->assertSame('0.00',  $order->discountAmount());
+        $this->assertSame('80.00', $order->total());
     }
 
     public function test_persists_order_items_with_name_and_price(): void

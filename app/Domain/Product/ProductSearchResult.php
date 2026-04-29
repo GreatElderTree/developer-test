@@ -8,9 +8,9 @@ class ProductSearchResult
     /** @param Product[] $items */
     public function __construct(
         public readonly array $items,
-        public readonly int   $total,
-        public readonly int   $perPage,
-        public readonly int   $currentPage,
-        public readonly int   $lastPage,
+        public readonly int $total,
+        public readonly int $perPage,
+        public readonly int $currentPage,
+        public readonly int $lastPage,
     ) {}
 }
