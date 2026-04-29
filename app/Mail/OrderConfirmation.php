@@ -13,7 +13,10 @@ class OrderConfirmation extends Mailable
 {
     use Queueable;
 
-    public function __construct(public readonly int $orderId) {}
+    public function __construct(
+        public readonly int $orderId,
+        private readonly OrderRepositoryInterface $orderRepository,
+    ) {}
 
     public function envelope(): Envelope
     {
@@ -22,7 +25,7 @@ class OrderConfirmation extends Mailable
 
     public function content(): Content
     {
-        $order = app(OrderRepositoryInterface::class)->findById($this->orderId);
+        $order = $this->orderRepository->findById($this->orderId);
 
         return new Content(view: 'mail.order-confirmation', with: ['order' => $order]);
     }

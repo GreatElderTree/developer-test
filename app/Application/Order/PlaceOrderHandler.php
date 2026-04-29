@@ -45,7 +45,7 @@ class PlaceOrderHandler
 
         foreach ($command->items as $item) {
             $product     = $products[$item['product_id']];
-            $subtotal    = bcadd($subtotal, bcmul((string) $product->price, (string) $item['qty'], 2), 2);
+            $subtotal    = bcadd($subtotal, bcmul($product->price, (string) $item['qty'], 2), 2);
             $orderItems[] = new OrderItem(
                 productId:   $product->id,
                 productName: $product->name,
@@ -54,7 +54,7 @@ class PlaceOrderHandler
             );
         }
 
-        $discount = $this->discountCalculator->calculate((float) $subtotal, $customer);
+        $discount = $this->discountCalculator->calculate($subtotal, $customer);
         $order    = Order::place($orderItems, $customer, $guestEmail, $discount);
         $order    = $this->orderRepository->save($order);
 

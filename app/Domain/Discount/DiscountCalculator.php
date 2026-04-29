@@ -11,7 +11,7 @@ class DiscountCalculator
     /** @param DiscountRuleInterface[] $rules */
     public function __construct(private readonly array $rules) {}
 
-    public function calculate(float $subtotal, ?Customer $customer): DiscountResult
+    public function calculate(string $subtotal, ?Customer $customer): DiscountResult
     {
         $context = new DiscountContext($subtotal, $customer);
 
@@ -19,6 +19,6 @@ class DiscountCalculator
             $context = $context->withDiscount($rule->apply($context));
         }
 
-        return new DiscountResult($context->accumulatedDiscount(), $subtotal);
+        return new DiscountResult((string) $context->accumulatedDiscount(), $subtotal);
     }
 }

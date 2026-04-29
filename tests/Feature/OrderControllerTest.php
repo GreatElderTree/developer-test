@@ -81,6 +81,25 @@ class OrderControllerTest extends TestCase
         );
     }
 
+    public function test_order_confirmation_mail_renders_correctly(): void
+    {
+        $this->app->bind(OrderNotifierInterface::class, LaravelMailOrderNotifier::class);
+
+        $product = $this->createProduct(33.33);
+
+        $this->post(route('orders.store'), [
+            'customer_email' => 'buyer@example.com',
+            'items'          => [['product_id' => $product->id, 'qty' => 3]],
+        ]);
+
+        $order = \App\Infrastructure\Persistence\Models\OrderModel::first();
+        $mailable = app(OrderConfirmation::class, ['orderId' => $order->id]);
+
+        $html = $mailable->render();
+        $this->assertStringContainsString((string) $order->id, $html);
+        $this->assertStringContainsString('99.99', $html);
+    }
+
     public function test_validation_rejects_missing_email(): void
     {
         $this->post(route('orders.store'), ['items' => [['product_id' => 1, 'qty' => 1]]])

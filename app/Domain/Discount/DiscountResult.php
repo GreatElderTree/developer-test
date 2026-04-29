@@ -5,15 +5,15 @@ namespace App\Domain\Discount;
 /** Immutable output of the discount pipeline: percentage, amount, and final total derived from subtotal. */
 class DiscountResult
 {
-    public readonly float $amount;
-    public readonly float $total;
+    public readonly string $amount;
+    public readonly string $total;
 
     public function __construct(
-        public readonly float $percentage,
-        public readonly float $subtotal,
+        public readonly string $percentage,
+        public readonly string $subtotal,
     ) {
-        $amount       = bcmul((string) $subtotal, bcdiv((string) $percentage, '100', 10), 2);
-        $this->amount = (float) $amount;
-        $this->total  = (float) bcsub((string) $subtotal, $amount, 2);
+        $amount       = bcmul($subtotal, bcdiv($percentage, '100', 10), 2);
+        $this->amount = $amount;
+        $this->total  = bcsub($subtotal, $amount, 2);
     }
 }

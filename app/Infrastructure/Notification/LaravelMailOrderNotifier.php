@@ -19,7 +19,7 @@ class LaravelMailOrderNotifier implements OrderNotifierInterface
         }
 
         try {
-            Mail::to($recipientEmail)->queue(new OrderConfirmation($orderId));
+            Mail::to($recipientEmail)->queue(app(OrderConfirmation::class, ['orderId' => $orderId]));
 
             Log::info('Order confirmation queued', [
                 'order_id' => $orderId,
